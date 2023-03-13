@@ -80,44 +80,6 @@ Como se observo anteriormente los datos no se encuentran balanceados, por ende s
 db<-read.csv('VirusSample.csv')
 table(db$class)
 db$class[db$class=='Crypt'|db$class=='Downloader' |db$class=='Dropper' |  db$class=='Keylogger'| db$class=='Ransomware'|db$class=='Riskware'| db$class=='Spyware'] <- 'Otro'
-# db<-db[!(db$class=="Crypt"),]
-# db<-db[!(db$class=="Downloader"),]
-# db<-db[!(db$class=="Dropper"),]
-# db<-db[!(db$class=="Keylogger"),]
-# db<-db[!(db$class=="Ransomware"),]
-# db<-db[!(db$class=="Riskware"),]
-# db<-db[!(db$class=="Spyware"),]
-# 
-
-
-# #Crypt
-# for (x in 1:100){
-#   db[nrow(db) + 1,] <- c(db[db$class=='Crypt',])
-# }
-# #Dropper
-# for (x in 1:100){
-#   db[nrow(db) + 1,] <- c(db[db$class=='Dropper',])
-# }
-# #Keylogger
-# for (x in 1:100){
-#   db[nrow(db) + 1,] <- c(db[db$class=='Keylogger',])
-# }
-# #Ransomware
-# for (x in 1:100){
-#   db[nrow(db) + 1,] <- c(db[db$class=='Ransomware',])
-# }
-# #Riskware
-# for (x in 1:100){
-#   db[nrow(db) + 1,] <- c(db[db$class=='Riskware',])
-# }
-# #Spyware
-# for (x in 1:100){
-#   db[nrow(db) + 1,] <- c(db[db$class=='Spyware',])
-# }
-# #Downloader
-# for (x in 1:100){
-#   db[nrow(db) + 1,] <- c(db[db$class=='Downloader',])
-# }
 
 table(db$class)
 ```
