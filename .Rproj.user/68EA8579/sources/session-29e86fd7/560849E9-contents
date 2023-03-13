@@ -1,0 +1,3 @@
+db<-read.csv('VirusSample.csv')
+
+

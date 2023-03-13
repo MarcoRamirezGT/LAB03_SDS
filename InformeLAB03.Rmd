@@ -1,0 +1,163 @@
+---
+title: "Informe Lab03"
+author: "Marco Ramírez"
+date: "2023-03-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Laboratorio #3 – Clasificación de Malware
+
+### Exploracion de datos e ingenieria de caracteristicas
+
+```{r}
+db<-read.csv('VirusSample.csv')
+#Resumen de datos
+summary(db)
+#Las primeros 5 filas
+head(db,5)
+#Cantidad de columnas
+ncol(db)
+#Cantidad de filas
+nrow(db)
+
+```
+
+Como se logra observar la base de datos 'VirusSample.csv' tiene `r ncol(db)` columnas y *`r nrow(db)`* filas.
+
+***
+Como parte importante para poder clasificar los tipos de virus, se requiere verificar la cantidad de datos de cada uno. 
+
+```{r }
+table(db$class)
+plot(table(db$class))
+```
+
+Como se observa los tipos de virus no se encuentran balanceados, sin embargo, si los balanceamos tendriamos como minimo 1 tipo de virus por categoria, por ende, seguiremos trabajando de esta manera.
+***
+Tambien podemos ver las APIS mas repetidas en el dataset
+```{r message=FALSE, warning=FALSE}
+library("RColorBrewer")
+library("syuzhet")
+library("ggplot2")
+library("SnowballC")
+library("wordcloud")
+library("tm")
+
+db$api<-gsub(",", " ", db$api)
+
+TextDoc <- Corpus(VectorSource(db$api))
+toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+TextDoc <- tm_map(TextDoc, content_transformer(tolower))
+TextDoc_dtm <- TermDocumentMatrix(TextDoc)
+dtm_m <- as.matrix(TextDoc_dtm)
+# Sort by descearing value of frequency
+dtm_v <- sort(rowSums(dtm_m),decreasing=TRUE)
+dtm_d <- data.frame(word = names(dtm_v),freq=dtm_v)
+# Display the top 5 most frequent words
+(dtm_d[1:10,])
+
+barplot(dtm_d[1:10,]$freq, las = 2, names.arg = dtm_d[1:10,]$word,
+        col ="lightgreen", main ="Las 10 APIS mas repetidas en el dataset",
+        ylab = "Word frequencies")
+
+set.seed(1234)
+wordcloud(words = dtm_d$word, freq = dtm_d$freq, min.freq = 5,
+          max.words=100, random.order=FALSE, rot.per=0.40, 
+          colors=brewer.pal(8, "Dark2"))
+
+
+```
+
+### Preprocesamiento
+
+Como se observo anteriormente los datos no se encuentran balanceados, por ende se requiere balancearlos. Sin embargo, las siguientes variables contienen muy pocos datos por lo cual se decidio juntarlos. Siendo Crypt, Downloader, Dropper, Keylogger, Ransomware, Riskware y Spyware.
+
+```{r }
+db<-read.csv('VirusSample.csv')
+table(db$class)
+db$class[db$class=='Crypt'|db$class=='Downloader' |db$class=='Dropper' |  db$class=='Keylogger'| db$class=='Ransomware'|db$class=='Riskware'| db$class=='Spyware'] <- 'Otro'
+# db<-db[!(db$class=="Crypt"),]
+# db<-db[!(db$class=="Downloader"),]
+# db<-db[!(db$class=="Dropper"),]
+# db<-db[!(db$class=="Keylogger"),]
+# db<-db[!(db$class=="Ransomware"),]
+# db<-db[!(db$class=="Riskware"),]
+# db<-db[!(db$class=="Spyware"),]
+# 
+
+
+# #Crypt
+# for (x in 1:100){
+#   db[nrow(db) + 1,] <- c(db[db$class=='Crypt',])
+# }
+# #Dropper
+# for (x in 1:100){
+#   db[nrow(db) + 1,] <- c(db[db$class=='Dropper',])
+# }
+# #Keylogger
+# for (x in 1:100){
+#   db[nrow(db) + 1,] <- c(db[db$class=='Keylogger',])
+# }
+# #Ransomware
+# for (x in 1:100){
+#   db[nrow(db) + 1,] <- c(db[db$class=='Ransomware',])
+# }
+# #Riskware
+# for (x in 1:100){
+#   db[nrow(db) + 1,] <- c(db[db$class=='Riskware',])
+# }
+# #Spyware
+# for (x in 1:100){
+#   db[nrow(db) + 1,] <- c(db[db$class=='Spyware',])
+# }
+# #Downloader
+# for (x in 1:100){
+#   db[nrow(db) + 1,] <- c(db[db$class=='Downloader',])
+# }
+
+table(db$class)
+```
+
+### Implementacion
+
+```{r message=FALSE, warning=FALSE}
+#Importamos las librerias necesarias
+library(e1071)
+library(caret)
+
+db$class<-as.factor(db$class)
+db$file<-as.factor(db$file)
+db$api<-as.factor(db$api)
+#SVM
+#Indicamos el porcentaje de entranamiento
+porcentaje<-0.7
+
+#Datos de entrenamiento y prueba
+corte <- sample(nrow(db),nrow(db)*porcentaje)
+train<-db[corte,]
+test<-db[-corte,]
+
+#Como tenemos muy pocos datos de spyware 
+#Creamos el modelo
+modelosvm<-svm(class~., data = train, scale = F)
+summary(modelosvm)
+```
+
+Como se observa se creo el modelo correctamente, indicando que poseemos 13 variables. Con un kernel radial, siendo este el default.
+
+
+### Precision de los modelos
+
+```{r message=FALSE, warning=FALSE}
+#Modelos
+
+predi<-predict(modelosvm,test[,1:2])
+confusionMatrix(test$class,predi)
+
+```
+
+
