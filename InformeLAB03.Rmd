@@ -1,6 +1,6 @@
 ---
 title: "Informe Lab03"
-author: "Marco Ramírez"
+author: "Marco Ramírez, Javier Hernandez"
 date: "2023-03-12"
 output: html_document
 ---
@@ -111,6 +111,76 @@ summary(modelosvm)
 
 Como se observa se creo el modelo correctamente, indicando que poseemos 13 variables. Con un kernel radial, siendo este el default.
 
+```{r message=FALSE, warning=FALSE}
+#Importamos las librerias necesarias
+library(rsample) 
+library(randomForest)
+library(caret)
+library(tidyverse)
+
+db<-read.csv('VirusSample.csv')
+db$class<-as.factor(db$class)
+db$file<-as.factor(db$file)
+db$api<-as.factor(db$api)
+
+# RANDOM FOREST
+set.seed(123)
+db_split<-initial_split(db, prop = .7)
+db_train<-training(db_split)
+db_test <-testing(db_split)
+
+set.seed(123)
+
+# RF por defecto (500 arboles y p/3 variables aleatorias)
+m1 <- randomForest(
+  formula = class~.,
+  data = db_train
+)
+
+set.seed(123)
+db_split2 <- initial_split(db_train, .7)
+
+db_train2 <- analysis(db_split2)
+
+db_valid <- assessment(db_split2)
+x_test <- db_valid[setdiff(names(db_valid), "class")]
+y_test <- db_valid$class
+
+rf_oob_comp <- randomForest(
+  formula = class ~ .,
+  data    = db_train2,
+  xtest   = x_test,
+  ytest   = y_test
+)
+
+oob <- sqrt(rf_oob_comp$mse)
+validation <- sqrt(rf_oob_comp$test$mse)
+
+tibble::tibble(
+  `Out of Bag Error` = oob,
+  `Test error` = validation,
+  ntrees = 1:rf_oob_comp$ntree
+) %>%
+  gather(Metric, RMSE, -ntrees) %>%
+  ggplot(aes(ntrees, RMSE, color = Metric)) +
+  geom_line() +
+  scale_y_continuous(labels = scales::dollar) +
+  xlab("Number of trees")
+```
+
+a
+
+```{r}
+m1
+```
+
+a
+
+```{r}
+plot(m1)
+```
+
+a
 
 ### Precision de los modelos
 
