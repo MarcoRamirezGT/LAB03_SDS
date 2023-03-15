@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Marco Ramírez" />
+<meta name="author" content="Marco Ramírez, Javier Hernandez" />
 
 <meta name="date" content="2023-03-12" />
 
@@ -351,7 +351,7 @@ display: none;
 
 
 <h1 class="title toc-ignore">Informe Lab03</h1>
-<h4 class="author">Marco Ramírez</h4>
+<h4 class="author">Marco Ramírez, Javier Hernandez</h4>
 <h4 class="date">2023-03-12</h4>
 
 </div>
@@ -466,44 +466,6 @@ table(db$class)</code></pre>
 ## Ransomware   Riskware    Spyware     Trojan      Virus      Worms 
 ##         10          4         11       6153       2367        441</code></pre>
 <pre class="r"><code>db$class[db$class==&#39;Crypt&#39;|db$class==&#39;Downloader&#39; |db$class==&#39;Dropper&#39; |  db$class==&#39;Keylogger&#39;| db$class==&#39;Ransomware&#39;|db$class==&#39;Riskware&#39;| db$class==&#39;Spyware&#39;] &lt;- &#39;Otro&#39;
-# db&lt;-db[!(db$class==&quot;Crypt&quot;),]
-# db&lt;-db[!(db$class==&quot;Downloader&quot;),]
-# db&lt;-db[!(db$class==&quot;Dropper&quot;),]
-# db&lt;-db[!(db$class==&quot;Keylogger&quot;),]
-# db&lt;-db[!(db$class==&quot;Ransomware&quot;),]
-# db&lt;-db[!(db$class==&quot;Riskware&quot;),]
-# db&lt;-db[!(db$class==&quot;Spyware&quot;),]
-# 
-
-
-# #Crypt
-# for (x in 1:100){
-#   db[nrow(db) + 1,] &lt;- c(db[db$class==&#39;Crypt&#39;,])
-# }
-# #Dropper
-# for (x in 1:100){
-#   db[nrow(db) + 1,] &lt;- c(db[db$class==&#39;Dropper&#39;,])
-# }
-# #Keylogger
-# for (x in 1:100){
-#   db[nrow(db) + 1,] &lt;- c(db[db$class==&#39;Keylogger&#39;,])
-# }
-# #Ransomware
-# for (x in 1:100){
-#   db[nrow(db) + 1,] &lt;- c(db[db$class==&#39;Ransomware&#39;,])
-# }
-# #Riskware
-# for (x in 1:100){
-#   db[nrow(db) + 1,] &lt;- c(db[db$class==&#39;Riskware&#39;,])
-# }
-# #Spyware
-# for (x in 1:100){
-#   db[nrow(db) + 1,] &lt;- c(db[db$class==&#39;Spyware&#39;,])
-# }
-# #Downloader
-# for (x in 1:100){
-#   db[nrow(db) + 1,] &lt;- c(db[db$class==&#39;Downloader&#39;,])
-# }
 
 table(db$class)</code></pre>
 <pre><code>## 
@@ -553,6 +515,81 @@ summary(modelosvm)</code></pre>
 ##  Adware Agent Backdoor Otro Trojan Virus Worms</code></pre>
 <p>Como se observa se creo el modelo correctamente, indicando que
 poseemos 13 variables. Con un kernel radial, siendo este el default.</p>
+<pre class="r"><code>#Importamos las librerias necesarias
+library(randomForest)
+library(forcats)
+
+#Modificamos la data
+new_db &lt;- db[, c(&quot;api&quot;,&quot;class&quot;)]
+new_db$new_api &lt;- fct_lump(new_db$api, n = 50, other_level = &quot;Otros&quot;)
+head(new_db, 5)</code></pre>
+<pre><code>##                                                                                                                   api
+## 1                                                                          IntersectRect,GetCurrentProcess,GetVersion
+## 2                                          GetCaretBlinkTime,CountClipboardFormats,GetConsoleWindow,GetCurrentProcess
+## 3                                                      VarR8Pow,GetClipboardViewer,GetInputDesktop,GetUserDefaultLCID
+## 4                           SetTraceCallback,CopyAcceleratorTableW,GetProcessHeap,GetSystemDefaultLangID,GetLastError
+## 5 SHLoadNonloadedIconOverlayIdentifiers,VarUI8FromDisp,GetSystemRegistryQuota,GetConsoleWindow,GetOpenClipboardWindow
+##   class new_api
+## 1 Virus   Otros
+## 2 Virus   Otros
+## 3 Virus   Otros
+## 4 Virus   Otros
+## 5 Virus   Otros</code></pre>
+<pre class="r"><code>summary(new_db)</code></pre>
+<pre><code>##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    api      
+##  LoadLibraryA,GetProcAddress                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         :1007  
+##  LoadLibraryA,GetProcAddress,VirtualProtect,VirtualAlloc,VirtualFree,ExitProcess,atoi,PathFileExistsA,wsprintfA                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      : 830  
+##  MessageBoxA,wsprintfA,ExitProcess,GetModuleHandleA,GetProcAddress,VirtualProtect,VirtualAlloc,VirtualFree,LoadLibraryA                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              : 544  
+##  MethCallEngine,EVENT_SINK_AddRef,DllFunctionCall,EVENT_SINK_Release,EVENT_SINK_QueryInterface,__vbaExceptHandler,ProcCallEngine                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     : 519  
+##  GetModuleHandleA,GetProcAddress,fabs,InitCommonControls,IsChild,BitBlt,CoInitialize,ShellExecuteExA,PathQuoteSpacesA                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                : 382  
+##  WSAGetLastError,WSAStartup,__WSAFDIsSet,accept,bind,closesocket,connect,gethostbyname,htonl,htons,inet_addr,ioctlsocket,listen,recv,select,send,socket,CoCreateInstance,CLSIDFromString,CoTaskMemFree,CoInitialize,CoUninitialize,SysAllocString,DeleteUrlCacheEntry,FindFirstUrlCacheEntryA,FindNextUrlCacheEntryA,ExitProcess,ExitThread,ExpandEnvironmentStringsA,FileTimeToLocalFileTime,FileTimeToSystemTime,FindClose,FindFirstFileA,FindNextFileA,FreeLibrary,GetCommandLineA,GetCurrentProcessId,GetCurrentThreadId,GetExitCodeProcess,GetExitCodeThread,GetFileAttributesA,GetFileSize,GetFileTime,GetLocalTime,GetModuleFileNameA,GetModuleHandleA,CloseHandle,GetProcAddress,GetSystemDirectoryA,GetTempPathA,GetTickCount,GetTimeZoneInformation,GetVersion,GetVersionExA,GetWindowsDirectoryA,GlobalMemoryStatus,CopyFileA,InterlockedIncrement,IsBadReadPtr,IsBadWritePtr,LoadLibraryA,CreateDirectoryA,LocalAlloc,LocalFree,OpenFile,OpenMutexA,OpenProcess,PeekNamedPipe,CreateFileA,ReadFile,RemoveDirectoryA,RtlUnwind,SetFileAttributesA,SetFilePointer,CreateMutexA,Sleep,TerminateProcess,TerminateThread,CreatePipe,VirtualQuery,CreateProcessA,WaitForSingleObject,WideCharToMultiByte,WinExec,WriteFile,lstrlenA,lstrlenW,CreateThread,DeleteFileA,GetWindowTextA,GetWindowRect,FindWindowA,GetWindow,IsWindowVisible,GetClassNameA,GetForegroundWindow,LoadCursorA,SetTimer,KillTimer,RegisterClassA,GetMessageA,CreateDesktopA,SetThreadDesktop,GetThreadDesktop,TranslateMessage,DispatchMessageA,SendMessageA,CharUpperBuffA,OemToCharA,PostQuitMessage,ShowWindow,CreateWindowExA,DestroyWindow,DefWindowProcA,GetStockObject,DeleteObject,RegCreateKeyExA,RegCloseKey,RegOpenKeyExA,RegQueryValueExA,RegSetValueExA,GetSecurityInfo,SetSecurityInfo,SetEntriesInAclA,_itoa,__GetMainArgs,_sleep,_strcmpi,_stricmp,atoi,exit,memcpy,memset,raise,rand,signal,sprintf,srand,sscanf,strcat,strchr,strncmp: 324  
+##  (Other)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             :6189  
+##       class     
+##  Adware  : 222  
+##  Agent   : 102  
+##  Backdoor: 447  
+##  Otro    :  63  
+##  Trojan  :6153  
+##  Virus   :2367  
+##  Worms   : 441  
+##                                                                                                                             new_api    
+##  Otros                                                                                                                          :3374  
+##  LoadLibraryA,GetProcAddress                                                                                                    :1007  
+##  LoadLibraryA,GetProcAddress,VirtualProtect,VirtualAlloc,VirtualFree,ExitProcess,atoi,PathFileExistsA,wsprintfA                 : 830  
+##  MessageBoxA,wsprintfA,ExitProcess,GetModuleHandleA,GetProcAddress,VirtualProtect,VirtualAlloc,VirtualFree,LoadLibraryA         : 544  
+##  MethCallEngine,EVENT_SINK_AddRef,DllFunctionCall,EVENT_SINK_Release,EVENT_SINK_QueryInterface,__vbaExceptHandler,ProcCallEngine: 519  
+##  GetModuleHandleA,GetProcAddress,fabs,InitCommonControls,IsChild,BitBlt,CoInitialize,ShellExecuteExA,PathQuoteSpacesA           : 382  
+##  (Other)                                                                                                                        :3139</code></pre>
+<pre class="r"><code>#Indicamos el porcentaje de entranamiento
+porcentaje&lt;-0.7
+
+#Datos de entrenamiento y prueba
+corte2 &lt;- sample(nrow(new_db),nrow(new_db)*porcentaje)
+train2&lt;-new_db[corte2,]
+test2&lt;-new_db[-corte2,]
+
+#Creamos el modelo
+#modelosvm&lt;-svm(class~., data = train, scale = F)
+#summary(modelosvm)
+modelo_rf &lt;- randomForest(class ~ new_api, data = train2, ntree = 500)
+print(modelo_rf)</code></pre>
+<pre><code>## 
+## Call:
+##  randomForest(formula = class ~ new_api, data = train2, ntree = 500) 
+##                Type of random forest: classification
+##                      Number of trees: 500
+## No. of variables tried at each split: 1
+## 
+##         OOB estimate of  error rate: 13.74%
+## Confusion matrix:
+##          Adware Agent Backdoor Otro Trojan Virus Worms class.error
+## Adware       89     0        0    0      9    71     0   0.4733728
+## Agent         0     0        0    0     60    12     0   1.0000000
+## Backdoor      0     0      301    0     24    11     0   0.1041667
+## Otro          4     0        0    0      1    39     0   1.0000000
+## Trojan        0     0        0    0   3782   508    18   0.1220984
+## Virus         0     0        0    0     30  1589     1   0.0191358
+## Worms         0     0        0    0     68    86   153   0.5016287</code></pre>
 </div>
 <div id="precision-de-los-modelos" class="section level3">
 <h3>Precision de los modelos</h3>
@@ -603,6 +640,51 @@ confusionMatrix(test$class,predi)</code></pre>
 ## Detection Rate              0.6264       0.0000      0.00000
 ## Detection Prevalence        0.6264       0.2423      0.04389
 ## Balanced Accuracy               NA           NA           NA</code></pre>
+<pre class="r"><code>predi2&lt;-predict(modelo_rf,test2[,1:3])
+confusionMatrix(test2$class,predi2)</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction Adware Agent Backdoor Otro Trojan Virus Worms
+##   Adware       28     0        0    0      1    24     0
+##   Agent         0     0        0    0     20    10     0
+##   Backdoor      0     0       89    0     16     6     0
+##   Otro          2     0        0    0      1    16     0
+##   Trojan        1     0        0    0   1604   230    10
+##   Virus         0     0        0    0     14   733     0
+##   Worms         0     0        0    0     30    39    65
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.8571          
+##                  95% CI : (0.8439, 0.8696)
+##     No Information Rate : 0.5737          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.7382          
+##                                           
+##  Mcnemar&#39;s Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: Adware Class: Agent Class: Backdoor Class: Otro
+## Sensitivity               0.903226           NA         1.00000          NA
+## Specificity               0.991403      0.98979         0.99228    0.993535
+## Pos Pred Value            0.528302           NA         0.80180          NA
+## Neg Pred Value            0.998960           NA         1.00000          NA
+## Prevalence                0.010548      0.00000         0.03028    0.000000
+## Detection Rate            0.009527      0.00000         0.03028    0.000000
+## Detection Prevalence      0.018033      0.01021         0.03777    0.006465
+## Balanced Accuracy         0.947314           NA         0.99614          NA
+##                      Class: Trojan Class: Virus Class: Worms
+## Sensitivity                 0.9514       0.6928      0.86667
+## Specificity                 0.8077       0.9926      0.97591
+## Pos Pred Value              0.8694       0.9813      0.48507
+## Neg Pred Value              0.9250       0.8517      0.99643
+## Prevalence                  0.5737       0.3600      0.02552
+## Detection Rate              0.5458       0.2494      0.02212
+## Detection Prevalence        0.6278       0.2542      0.04559
+## Balanced Accuracy           0.8795       0.8427      0.92129</code></pre>
 </div>
 </div>
 
