@@ -595,6 +595,33 @@ print(modelo_rf)</code></pre>
 ## Trojan        0     0        0    0   3782   508    18   0.1220984
 ## Virus         0     0        0    0     30  1589     1   0.0191358
 ## Worms         0     0        0    0     68    86   153   0.5016287</code></pre>
+<pre class="r"><code>#Mostrar el arbol generado por el modelo
+#library(rpart.plot)
+#attach(train2)
+
+#Obtener árbol del modelo
+#arbol_rf &lt;- randomForest::getTree(modelo_rf, k = 1)
+
+#Convertir el árbol de randomForest en un objeto rpart
+#arbol_rpart &lt;- rpart::rpart(
+#  formula = formula(modelo_rf),
+#  data = modelo_rf$forest$x,
+#  method = &quot;class&quot;,
+#  control = rpart::rpart.control(cp = 0.001)
+#)
+
+#Graficar el árbol con rpart.plot
+#rpart.plot::rpart.plot(
+#  arbol_rpart,
+#  extra = 1,
+#  under = TRUE,
+#  box.palette = &quot;Greens&quot;,
+#  branch.lty = 3,
+#  nn = TRUE
+#)
+
+#m1&lt;-rpart(class ~ ., data = train2)
+#rpart.plot(m1, type = 3, digits = 3, fallen.leaves = TRUE)</code></pre>
 <p>Se puede observar que el modelo fue creado de manera correcta y que
 tiene una estimación OOB de la tasa de error de un 13.74%. Esto
 significa que ese porcentaje es el porcentaje de error o de equivocación
