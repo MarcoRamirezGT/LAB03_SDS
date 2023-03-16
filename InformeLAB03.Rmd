@@ -139,6 +139,33 @@ test2<-new_db[-corte2,]
 #summary(modelosvm)
 modelo_rf <- randomForest(class ~ new_api, data = train2, ntree = 500)
 print(modelo_rf)
+
+#Mostrar el arbol generado por el modelo
+library(rpart.plot)
+attach(train2)
+
+#Obtener árbol del modelo
+arbol_rf <- randomForest::getTree(modelo_rf, k = 1)
+
+#Convertir el árbol de randomForest en un objeto rpart
+arbol_rpart <- rpart::rpart(
+  formula = formula(modelo_rf),
+  data = modelo_rf$forest$x,
+  method = "class",
+  control = rpart::rpart.control(cp = 0.001)
+)
+
+#Graficar el árbol con rpart.plot
+rpart.plot::rpart.plot(
+  arbol_rpart,
+  extra = 1,
+  under = TRUE,
+  box.palette = "Greens",
+  branch.lty = 3,
+  nn = TRUE
+)
+#m1<-rpart(class ~ ., data = train2)
+#rpart.plot(m1, type = 3, digits = 3, fallen.leaves = TRUE)
 ```
 
 Se puede observar que el modelo fue creado de manera correcta y que tiene una estimación OOB de la tasa de error de un 13.74%. Esto significa que ese porcentaje es el porcentaje de error o de equivocación del método OBB que evalua la precisión del modelo, y es bueno ya que es un porcentaje bajo.
